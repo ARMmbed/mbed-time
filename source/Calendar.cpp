@@ -16,7 +16,6 @@
 
 
 #include "mbed-time/Calendar.h"
-#include "minar_platform/minar_platform.h"
 
 #include <time.h>
 #include <sys/time.h>
