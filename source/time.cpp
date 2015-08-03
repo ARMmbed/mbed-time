@@ -16,7 +16,7 @@
 
 
 #include "mbed.h"
-#include "minar_platform/minar_platform.h"
+#include "minar-platform/minar_platform.h"
 
 #include <sys/time.h>
 
