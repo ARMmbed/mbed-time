@@ -15,13 +15,12 @@
  */
 
 
-#include "mbed.h"
-#include "minar-platform/minar_platform.h"
+#include "mbed-hal/lp_ticker_api.h"
 
 #include <sys/time.h>
 
 
-static time_t unixTimeOffset = 1420070400; // default boot time is January 1st 2015 0:0:0 UTC
+static time_t unixTimeOffset __attribute__ ((section (".noinit")));//  = 1420070400; // default boot time is January 1st 2015 0:0:0 UTC
 
 
 extern "C"
@@ -73,32 +72,46 @@ static void getTimeval(struct timeval* tvp)
         /*  read overflow counter twice to prevent inconsistency between
             tick counter and overflow counter.
         */
-
-        uint32_t preOverflow = minar::platform::getTimeOverflows();
-        uint32_t lowTicks = minar::platform::getTime();
-        uint32_t postOverflow = minar::platform::getTimeOverflows();
+        uint32_t preOverflow = lp_ticker_get_overflows_counter();
+        uint32_t lowTicks = lp_ticker_read();
+        uint32_t postOverflow = lp_ticker_get_overflows_counter();
 
         /*  Overflow occured. Read tick counter again for consistency and redo
             the highTick calculation.
         */
         if (preOverflow != postOverflow)
         {
-            lowTicks = minar::platform::getTime();
+            lowTicks = lp_ticker_read();
             overflow = postOverflow;
-            highTicks = ((uint64_t) overflow) * (minar::platform::Time_Mask+1);
+            highTicks = ((uint64_t) overflow) << 32;
         }
         /*  The cached highTick calculation is out of date. Redo calculation. */
         else if (overflow != postOverflow)
         {
             overflow = postOverflow;
-            highTicks = ((uint64_t) overflow) * (minar::platform::Time_Mask+1);
+            highTicks = ((uint64_t) overflow) << 32;
         }
 
-        uint64_t seconds = (highTicks + ((uint64_t) lowTicks)) / minar::platform::Time_Base;
+        uint64_t seconds = (highTicks + ((uint64_t) lowTicks)) / MINAR_PLATFORM_TIME_BASE;
 
         tvp->tv_sec = seconds;
-        tvp->tv_usec = (uint64_t)(lowTicks % minar::platform::Time_Base) * 1000000 / minar::platform::Time_Base;
+        tvp->tv_usec = (uint64_t)(lowTicks % MINAR_PLATFORM_TIME_BASE) * 1000000 / MINAR_PLATFORM_TIME_BASE;
     }
 }
 
+}
+
+namespace mbed
+{
+    namespace time
+    {
+        void saveOffset()
+        {
+            struct timeval localTVS;
+
+            getTimeval(&localTVS);
+
+            unixTimeOffset += localTVS.tv_sec;
+        }
+    }
 }

@@ -18,7 +18,7 @@
 #ifndef __CALENDAR_H__
 #define __CALENDAR_H__
 
-#include "mbed.h"
+#include <stdint.h>
 
 class Calendar
 {
