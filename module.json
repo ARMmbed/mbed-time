@@ -16,7 +16,7 @@
     }
   ],
   "dependencies": {
-    "mbed-hal": "~0.8.0"
+    "mbed-hal": "^1.0.0"
   },
   "targetDependencies": {}
 }
