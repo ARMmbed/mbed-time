@@ -174,38 +174,47 @@ uint32_t Calendar::getYear()
 
 void Calendar::setHour(uint8_t hour)
 {
-    time_t unixtime = time(NULL);
-    struct tm * timeinfo = localtime(&unixtime);
+    if (hour < 24)
+    {
+        time_t unixtime = time(NULL);
+        struct tm * timeinfo = localtime(&unixtime);
 
-    timeinfo->tm_hour = hour;
+        timeinfo->tm_hour = hour;
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 void Calendar::setMinute(uint8_t minute)
 {
-    time_t unixtime = time(NULL);
-    struct tm * timeinfo = localtime(&unixtime);
+    if (minute < 60)
+    {
+        time_t unixtime = time(NULL);
+        struct tm * timeinfo = localtime(&unixtime);
 
-    timeinfo->tm_min = minute;
+        timeinfo->tm_min = minute;
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 void Calendar::setSecond(uint8_t second)
 {
-    time_t unixtime = time(NULL);
-    struct tm * timeinfo = localtime(&unixtime);
+    if (second < 60)
+    {
+        time_t unixtime = time(NULL);
+        struct tm * timeinfo = localtime(&unixtime);
 
-    timeinfo->tm_sec = second;
+        timeinfo->tm_sec = second;
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 void Calendar::setDate(uint8_t date)
@@ -213,51 +222,64 @@ void Calendar::setDate(uint8_t date)
     time_t unixtime = time(NULL);
     struct tm * timeinfo = localtime(&unixtime);
 
-    timeinfo->tm_mday = date;
+    // check date integrity
+    int days = daysInMonth(timeinfo->tm_mon, timeinfo->tm_year);
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+    if ((date >= 1) && (date <= days))
+    {
+        timeinfo->tm_mday = date;
+
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 void Calendar::setMonth(uint8_t month)
 {
-    time_t unixtime = time(NULL);
-    struct tm * timeinfo = localtime(&unixtime);
-
-    // months are 0-indexed
-    timeinfo->tm_mon = month - 1;
-
-    // check date integrity
-    int days = daysInMonth(timeinfo->tm_mon, timeinfo->tm_year);
-    if (timeinfo->tm_mday > days)
+    if ((month >= 1) && (month <= 12))
     {
-        timeinfo->tm_mday = days;
-    }
+        time_t unixtime = time(NULL);
+        struct tm * timeinfo = localtime(&unixtime);
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+        // months are 0-indexed
+        timeinfo->tm_mon = month - 1;
+
+        // check date integrity
+        int days = daysInMonth(timeinfo->tm_mon, timeinfo->tm_year);
+
+        if (timeinfo->tm_mday > days)
+        {
+            timeinfo->tm_mday = days;
+        }
+
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 void Calendar::setYear(uint32_t year)
 {
-    time_t unixtime = time(NULL);
-    struct tm * timeinfo = localtime(&unixtime);
-
-    // tm_year is using 1900 as zero
-    timeinfo->tm_year = year - 1900;
-
-    // check date integrity
-    int days = daysInMonth(timeinfo->tm_mon, timeinfo->tm_year);
-    if (timeinfo->tm_mday > days)
+    if (year >= 1900)
     {
-        timeinfo->tm_mday = days;
-    }
+        time_t unixtime = time(NULL);
+        struct tm * timeinfo = localtime(&unixtime);
 
-    struct timeval tvp;
-    tvp.tv_sec = mktime(timeinfo);
-    settimeofday(&tvp, NULL);
+        // tm_year is using 1900 as zero
+        timeinfo->tm_year = year - 1900;
+
+        // check date integrity
+        int days = daysInMonth(timeinfo->tm_mon, timeinfo->tm_year);
+        if (timeinfo->tm_mday > days)
+        {
+            timeinfo->tm_mday = days;
+        }
+
+        struct timeval tvp;
+        tvp.tv_sec = mktime(timeinfo);
+        settimeofday(&tvp, NULL);
+    }
 }
 
 uint8_t Calendar::getDaysInMonth()
