@@ -24,15 +24,8 @@ uint8_t counter = 0;
 
 void printTime()
 {
-    if (counter++ < 10)
-    {
-        printf("*");
-        fflush(stdout);
-    }
-    else
-    {
-        MBED_HOSTTEST_RESULT(true);
-    }
+    printf("*");
+    fflush(stdout);
 }
 
 void app_start(int, char *[])
