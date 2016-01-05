@@ -21,8 +21,9 @@
 
 #include <sys/time.h>
 
-
-time_t unixtime;
+namespace {
+static time_t unixtime;
+}
 
 void endTime()
 {

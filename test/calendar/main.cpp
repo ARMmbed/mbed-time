@@ -21,8 +21,11 @@
 
 #include <sys/time.h>
 
-
+namespace {
+char buffer[32] = {0};
+time_t seconds;
 uint8_t counter = 0;
+}
 
 void endTime()
 {
@@ -31,19 +34,9 @@ void endTime()
 
 void printTime()
 {
-    if (counter++ < 5)
-    {
-        char buffer[32] = {0};
-        time_t seconds = time(NULL);
-
-        strftime(buffer, 32, "%Y-%m-%d %H:%M:%S %p", localtime(&seconds));
-        printf("MBED: [%ld] [%s]\r\n", seconds, buffer);
-    }
-    else
-    {
-        MBED_HOSTTEST_RESULT(true);
-    }
-
+    seconds = time(NULL);
+    strftime(buffer, 32, "%Y-%m-%d %H:%M:%S %p", localtime(&seconds));
+    printf("MBED: [%ld] [%s]\r\n", seconds, buffer);
 }
 
 void app_start(int, char *[])
