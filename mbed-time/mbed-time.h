@@ -26,5 +26,4 @@ namespace mbed
     }
 }
 
-
 #endif // __MBED_TIME_H__
